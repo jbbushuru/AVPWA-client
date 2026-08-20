@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Love+Ya+Like+A+Sister&display=swap');
+@import "tailwindcss";
+
+/* Define Theme Variables (Colors + Fonts) */
+@theme {
+  /* Register Custom Font Family (Creates utility class: `font-sister`) */
+  --font-sister: "Love Ya Like A Sister", cursive, sans-serif;
+  /* Custom Colors */
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-header-bg: var(--header-bg);
+  --color-bg-main: var(--bg-main);
+  --color-bg-card: var(--bg-card);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-border-main: var(--border-main);
+}
+
+/* 3. Light Mode Variables */
+:root {
+  --primary: #7B5E77;
+  --primary-hover: #1d4ed8;
+  --header-bg:#9B7B9530;
+  --bg-main: #FFFEF5;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-main: #e2e8f0;
+}
+
+/* 4. Dark Mode Variables */
+.dark {
+  --primary: #3b82f6;
+  --primary-hover: #60a5fa;
+  --header-bg:#1e293b;
+  --bg-main: #0f172a;
+  --bg-card: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-main: #334155;
+}
+
+/* 5. Base Styles */
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-family: system-ui, -apple-system, sans-serif;
+}
