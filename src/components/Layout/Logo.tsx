@@ -4,7 +4,7 @@ export default function Logo(){
         {/* Logo and Title */}
         <div className="hidden md:flex items-center p-4 space-x-3 bg-[#eeede4]">
             {/* Circular AV Logo Badge */}
-            <img src="./public/favicon.png" alt="AV Logo" className="w-8 h-8 rounded-full" />
+            <img src="/favicon.png" alt="AV Logo" className="w-8 h-8 rounded-full" />
 
             {/* Text Container */}
             <div className="flex flex-col">
