@@ -1,8 +1,9 @@
 import { PlusCircle } from "lucide-react";
 import { ViewMode } from "./ViewToggle";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getLessons, Lesson as APILesson } from "../../services/lessonService";
 import AddLesson from "./AddLesson";
+import { useLessons } from "../../hooks/useLessons";
 
 const EmptySlot = ({ onClick }: { onClick: () => void }) => {
     return (  
@@ -19,81 +20,77 @@ const EmptySlot = ({ onClick }: { onClick: () => void }) => {
 
 const LessonCard = ({ lesson }: { lesson: APILesson }) => {
     return (
-        <div className="flex-1 p-4 rounded-md border bg-blue-50/50">
-            <h3 className="font-bold text-lg">{lesson.unitName}</h3>
-            <p className="text-sm text-neutral-600">{lesson.time} | {lesson.venue}</p>
-            <p className="text-sm text-neutral-500">{lesson.lecturer}</p>
+        <div className="flex-1 p-4 rounded-md max-md:rounded-xl border-2 border-primary/20 bg-primary/5 hover:border-primary/40 transition-colors shadow-sm">
+            <h3 className="font-sister font-bold text-lg text-primary">{lesson.unitName}</h3>
+            <p className="text-sm font-medium text-neutral-700 mt-1">{lesson.time} <span className="text-neutral-400 mx-1">|</span> {lesson.venue}</p>
+            <p className="text-sm text-neutral-500 mt-0.5">{lesson.lecturer}</p>
         </div>
     );
 };
 
 const DailyLessonTask = () => {
   return (
-    <div className="p-4 border rounded-md bg-neutral-50"> Task </div>
+        <div className="p-4 rounded-md max-md:rounded-xl border-2 border-neutral-200 bg-white shadow-sm flex flex-col items-center justify-center text-neutral-400 hover:border-primary/30 transition-colors cursor-pointer">
+            <span className="font-sister tracking-wide">Tasks</span>
+        </div>
   )
 }
 
 function DailyLessons({ date }: { date: Date }) {
-    const [lessons, setLessons] = useState<APILesson[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedSlot, setSelectedSlot] = useState(1);
 
-    const fetchDailyLessons = async () => {
-        try {
-            const data: any = await getLessons();
-            // Handle if backend returns { count, lessons } or just array
-            const allLessons: APILesson[] = data.lessons || data || [];
-            
-            const targetDateStr = date.toISOString().split('T')[0];
-            const targetDateObj = new Date(targetDateStr);
-            const targetDayOfWeek = targetDateObj.getDay();
+    const { data: allLessons = [], invalidateLessons } = useLessons();
 
-            const todaysSlots = new Map<number, APILesson>();
+    const lessons = useMemo(() => {
+        const targetDateStr = date.toISOString().split('T')[0];
+        const targetDateObj = new Date(targetDateStr);
+        const targetDayOfWeek = targetDateObj.getDay();
 
-            // First pass: find repeating lessons that apply today
-            allLessons.forEach((l: APILesson) => {
-                if (l.repeat === 'weekly' || l.repeat === 'bi-weekly') {
-                    const lessonDateObj = new Date(l.dateKey);
-                    
-                    // It must start on or before the target date and fall on the same day of the week
-                    if (lessonDateObj <= targetDateObj && lessonDateObj.getDay() === targetDayOfWeek) {
-                        if (l.repeat === 'weekly') {
+        const todaysSlots = new Map<number, APILesson>();
+
+        // First pass: find repeating lessons that apply today
+        allLessons.forEach((l: APILesson) => {
+            if (l.repeat === 'weekly' || l.repeat === 'bi-weekly') {
+                const lessonDateObj = new Date(l.dateKey);
+                
+                // It must start on or before the target date and fall on the same day of the week
+                if (lessonDateObj <= targetDateObj && lessonDateObj.getDay() === targetDayOfWeek) {
+                    if (l.repeat === 'weekly') {
+                        todaysSlots.set(l.slot, l);
+                    } else if (l.repeat === 'bi-weekly') {
+                        // Calculate exact week difference
+                        const diffTime = Math.abs(targetDateObj.getTime() - lessonDateObj.getTime());
+                        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                        const diffWeeks = Math.floor(diffDays / 7);
+                        
+                        // Check if it's an even number of weeks since start
+                        if (diffWeeks % 2 === 0) {
                             todaysSlots.set(l.slot, l);
-                        } else if (l.repeat === 'bi-weekly') {
-                            // Calculate exact week difference
-                            const diffTime = Math.abs(targetDateObj.getTime() - lessonDateObj.getTime());
-                            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                            const diffWeeks = Math.floor(diffDays / 7);
-                            
-                            // Check if it's an even number of weeks since start
-                            if (diffWeeks % 2 === 0) {
-                                todaysSlots.set(l.slot, l);
-                            }
                         }
                     }
                 }
-            });
+            }
+        });
 
-            // Second pass: apply exact date matches (overrides repeating lessons if they exist)
-            allLessons.forEach((l: APILesson) => {
-                if (l.dateKey === targetDateStr) {
-                    if (l.unitName === '__HIDDEN__') {
-                        todaysSlots.delete(l.slot); // Cancelled for this day
-                    } else {
-                        todaysSlots.set(l.slot, l); // Specific lesson overrides
-                    }
+        // Second pass: apply exact date matches (overrides repeating lessons if they exist)
+        allLessons.forEach((l: APILesson) => {
+            if (l.dateKey === targetDateStr) {
+                if (l.unitName === '__HIDDEN__') {
+                    todaysSlots.delete(l.slot); // Cancelled for this day
+                } else {
+                    todaysSlots.set(l.slot, l); // Specific lesson overrides
                 }
-            });
+            }
+        });
 
-            setLessons(Array.from(todaysSlots.values()));
-        } catch (error) {
-            console.error("Failed to fetch lessons:", error);
-        }
+        return Array.from(todaysSlots.values());
+    }, [allLessons, date]);
+
+    const handleLessonAdded = () => {
+        invalidateLessons();
+        setIsModalOpen(false);
     };
-
-    useEffect(() => {
-        fetchDailyLessons();
-    }, [date]);
 
     const handleAddClick = (slot: number) => {
         setSelectedSlot(slot);
@@ -120,7 +117,7 @@ function DailyLessons({ date }: { date: Date }) {
         <AddLesson 
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
-            onLessonAdded={fetchDailyLessons}
+            onLessonAdded={handleLessonAdded}
             date={date}
             slot={selectedSlot}
         />

@@ -1,48 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
     X,
-    Clock,
     LayoutGrid,
     Timer,
     Sunrise,
     RotateCcw,
     Trash2,
-    CalendarDays,
     Save,
     Bell,
     BellRing,
 } from 'lucide-react';
+import { useApp } from '../../contexts/AppContext';
+import { updateTimetableSettings, deleteTimetableSettings } from '../../services/timetableService';
+import { deleteAllLessons } from '../../services/lessonService';
 
-// ─── Minimal local types (mirror your mobile TimetableContext) ────────────────
-interface TimetableSettings {
-    maxLessons: number;
-    lessonDuration: number;
-    firstLessonStartTime: number;
-    notificationsEnabled: boolean;
-    alertLeadTime: number;
-    hasOnboarded: boolean;
-}
-
-// Stub hook – replace with your real TimetableContext when wired up
-function useTimetable() {
-    const [settings, setSettings] = useState<TimetableSettings>({
-        maxLessons: 5,
-        lessonDuration: 1,
-        firstLessonStartTime: 8,
-        notificationsEnabled: true,
-        alertLeadTime: 15,
-        hasOnboarded: true,
-    });
-
-    const lessons: Record<string, Record<string, unknown>> = {};
-
-    const updateSettings = (next: TimetableSettings) => setSettings(next);
-    const resetTimetable = (cb?: () => void) => { cb?.(); };
-    const clearAllLessons = () => {};
-
-    return { settings, updateSettings, resetTimetable, clearAllLessons, lessons };
-}
-// ─────────────────────────────────────────────────────────────────────────────
+import type { TimetableSettings } from '../../services/timetableService';
 
 interface TimetableSettingsProps {
     isOpen: boolean;
@@ -58,7 +31,7 @@ interface IconCircleProps {
 function IconCircle({ color, children }: IconCircleProps) {
     return (
         <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
             style={{ backgroundColor: color + '18' }}
         >
             {children}
@@ -116,15 +89,53 @@ function PillSelect({ options, value, onChange }: PillSelectProps) {
                     key={opt.value}
                     type="button"
                     onClick={() => onChange(opt.value)}
-                    className={`px-4 py-2 rounded-xl text-[13px] font-semibold border transition-all duration-200 cursor-pointer ${
-                        value === opt.value
+                    className={`px-4 py-2 rounded-xl text-[13px] font-semibold border transition-all duration-200 cursor-pointer ${value === opt.value
                             ? 'bg-primary text-white border-primary shadow-sm scale-[1.03]'
                             : 'border-(--border-main) text-(--text-muted) hover:border-primary/60 hover:text-primary bg-(--bg-main)'
-                    }`}
+                        }`}
                 >
                     {opt.label}
                 </button>
             ))}
+        </div>
+    );
+}
+
+interface TimePickerProps {
+    value: string;
+    onChange: (v: string) => void;
+}
+function TimePicker({ value, onChange }: TimePickerProps) {
+    const to24Hour = (time12h: string) => {
+        if (!time12h || !time12h.includes(' ')) return "08:00"; // fallback if invalid
+        const [time, modifier] = time12h.split(' ');
+        let [hours, minutes] = time.split(':');
+        if (hours === '12') {
+            hours = '00';
+        }
+        if (modifier === 'PM') {
+            hours = (parseInt(hours, 10) + 12).toString();
+        }
+        return `${hours.padStart(2, '0')}:${minutes}`;
+    };
+
+    const to12Hour = (time24h: string) => {
+        if (!time24h) return "08:00 AM";
+        const [hours24, minutes] = time24h.split(':');
+        let hours = parseInt(hours24, 10);
+        const modifier = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        return `${hours.toString().padStart(2, '0')}:${minutes} ${modifier}`;
+    };
+
+    return (
+        <div className="flex w-full sm:max-w-50">
+            <input
+                type="time"
+                value={to24Hour(value)}
+                onChange={e => onChange(to12Hour(e.target.value))}
+                className="w-full px-4 py-2 rounded-xl text-[14px] font-semibold border transition-all duration-200 cursor-pointer border-(--border-main) text-(--text-main) hover:border-primary/60 hover:text-primary bg-(--bg-main) outline-none focus:border-primary focus:text-primary"
+            />
         </div>
     );
 }
@@ -147,7 +158,7 @@ function DangerAction({ icon, title, subtitle, color, onClick }: DangerActionPro
                 backgroundColor: color + '08',
             }}
         >
-            <div className="flex-shrink-0">{icon}</div>
+            <div className="shrink-0">{icon}</div>
             <div>
                 <p className="text-[14px] font-semibold" style={{ color }}>{title}</p>
                 <p className="text-[11px] mt-0.5 text-(--text-muted)">{subtitle}</p>
@@ -168,7 +179,7 @@ function Toggle({ checked, onChange, accentColor = '#10B981' }: ToggleProps) {
             role="switch"
             aria-checked={checked}
             onClick={() => onChange(!checked)}
-            className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none cursor-pointer flex-shrink-0"
+            className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none cursor-pointer shrink-0"
             style={{ backgroundColor: checked ? accentColor : 'var(--border-main)' }}
         >
             <span
@@ -180,60 +191,114 @@ function Toggle({ checked, onChange, accentColor = '#10B981' }: ToggleProps) {
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
-export default function TimetableSettings({ isOpen, onClose }: TimetableSettingsProps) {
-    const { settings, updateSettings, resetTimetable, clearAllLessons, lessons } = useTimetable();
+export default function Timetable_Settings({ isOpen, onClose }: TimetableSettingsProps) {
+    const { settings, setSettings, fetchUserSettings } = useApp();
+    const queryClient = useQueryClient();
 
-    const [draft, setDraft] = useState<TimetableSettings>({ ...settings });
-    const [hasChanges, setHasChanges] = useState(false);
+    const defaultDraft: TimetableSettings = settings ?? {
+        maxLessons: 0,
+        lessonDuration: 0,
+        firstLessonStartTime: '08:00 AM',
+        notificationsEnabled: false,
+        alertLeadTime: 0,
+    };
+
+    const [draft, setDraft] = useState<TimetableSettings>(defaultDraft);
+    const [isSaving, setIsSaving] = useState(false);
+
+    // Re-sync draft from live settings each time the drawer opens
+    useEffect(() => {
+        if (isOpen && settings) {
+            setDraft({ ...settings });
+        }
+    }, [isOpen, settings]);
 
     const updateDraft = (patch: Partial<TimetableSettings>) => {
         setDraft(prev => ({ ...prev, ...patch }));
-        setHasChanges(true);
     };
 
-    const handleSave = () => {
-        updateSettings({ ...draft, hasOnboarded: true });
-        setHasChanges(false);
-        onClose();
+    const hasChanges = JSON.stringify(draft) !== JSON.stringify(defaultDraft);
+    const isValid =
+        draft.maxLessons > 0 &&
+        draft.lessonDuration > 0 &&
+        !!draft.firstLessonStartTime &&
+        (!draft.notificationsEnabled || draft.alertLeadTime > 0);
+    const canSave = hasChanges && isValid;
+
+    const handleSave = async () => {
+        try {
+            setIsSaving(true);
+            const updated = await updateTimetableSettings(draft);
+            setSettings(updated);
+        } catch (error) {
+            console.error('Error saving timetable settings:', error);
+        } finally {
+            setIsSaving(false);
+            await fetchUserSettings();
+            onClose();
+        }
     };
 
-    // Stats
-    const totalLessonDays = Object.keys(lessons).length;
-    const totalLessons = Object.values(lessons).reduce(
-        (acc, day) => acc + Object.keys(day).length, 0
-    );
+    const handleReset = async () => {
+        try {
+            setIsSaving(true);
+
+            await deleteAllLessons();
+            await deleteTimetableSettings();
+
+            setSettings(null);
+        } catch (error) {
+            console.error('Error resetting timetable:', error);
+        } finally {
+            setIsSaving(false);
+            await Promise.all([
+                fetchUserSettings(),
+                queryClient.invalidateQueries({ queryKey: ['allLessons'] }),
+            ]);
+            onClose();
+        }
+    };
+
+    const handleClearLessons = async () => {
+        try {
+            setIsSaving(true);
+            await deleteAllLessons();
+        } catch (error) {
+            console.error('Error clearing lessons:', error);
+        } finally {
+            setIsSaving(false);
+            await queryClient.invalidateQueries({ queryKey: ['allLessons'] });
+            onClose();
+        }
+    };
 
     // Option arrays
     const maxLessonOptions = [3, 4, 5, 6, 7, 8].map(n => ({ label: `${n}`, value: n }));
     const durationOptions = [1, 2, 3].map(n => ({ label: `${n}h`, value: n }));
-    const startTimeOptions = [6, 7, 8, 9, 10, 11].map(h => ({ label: `${h}:00 AM`, value: h }));
     const leadTimeOptions = [5, 10, 15, 30, 60].map(m => ({ label: `${m} min`, value: m }));
 
     return (
         <>
             {/* ── Backdrop ──────────────────────────────────────────────── */}
             <div
-                className={`fixed inset-0 z-40 transition-all duration-300 ${
-                    isOpen
+                className={`fixed inset-0 z-40 transition-all duration-300 ${isOpen
                         ? 'bg-black/30 backdrop-blur-sm pointer-events-auto'
                         : 'bg-transparent pointer-events-none'
-                }`}
+                    }`}
                 onClick={onClose}
             />
 
             {/* ── Drawer ────────────────────────────────────────────────── */}
             <div
-                className={`fixed top-0 right-0 h-full z-50 flex flex-col bg-(--bg-card) shadow-2xl
+                className={`fixed top-0 right-0 h-full z-50 flex flex-col bg-amber-50 shadow-2xl
                     transition-transform duration-300 ease-in-out
-                    w-full sm:w-[420px]
+                    w-full sm:w-105
                     ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-(--border-main) flex-shrink-0"
-                    style={{ backgroundColor: 'var(--primary)' + '0d' }}>
+                <div className="flex items-center justify-between px-6 py-4 bg-[#eeede4] shrink-0">
                     <div>
                         <h2 className="text-[17px] font-bold text-(--text-main) tracking-tight">Timetable Settings</h2>
-                        <p className="text-[12px] text-(--text-muted) mt-0.5">Configure your schedule preferences</p>
                     </div>
                     <button
                         type="button"
@@ -246,39 +311,6 @@ export default function TimetableSettings({ isOpen, onClose }: TimetableSettings
 
                 {/* Scrollable body */}
                 <div className="flex-1 overflow-y-auto px-4 py-5">
-
-                    {/* ── Quick Stats ─────────────────────────────────── */}
-                    <div
-                        className="flex items-center justify-around rounded-2xl p-4 mb-5 border"
-                        style={{
-                            backgroundColor: 'var(--primary)' + '10',
-                            borderColor: 'var(--primary)' + '28',
-                        }}
-                    >
-                        <div className="flex flex-col items-center gap-1">
-                            <CalendarDays size={18} className="text-primary" />
-                            <span className="text-[20px] font-bold text-(--text-main)">{totalLessonDays}</span>
-                            <span className="text-[11px] font-medium text-(--text-muted)">Days</span>
-                        </div>
-
-                        <div className="w-px h-10" style={{ backgroundColor: 'var(--primary)' + '25' }} />
-
-                        <div className="flex flex-col items-center gap-1">
-                            <LayoutGrid size={18} className="text-primary" />
-                            <span className="text-[20px] font-bold text-(--text-main)">{totalLessons}</span>
-                            <span className="text-[11px] font-medium text-(--text-muted)">Lessons</span>
-                        </div>
-
-                        <div className="w-px h-10" style={{ backgroundColor: 'var(--primary)' + '25' }} />
-
-                        <div className="flex flex-col items-center gap-1">
-                            <Clock size={18} className="text-primary" />
-                            <span className="text-[20px] font-bold text-(--text-main)">
-                                {draft.lessonDuration}{draft.lessonDuration === 1 ? 'hr' : 'hrs'}
-                            </span>
-                            <span className="text-[11px] font-medium text-(--text-muted)">Per Class</span>
-                        </div>
-                    </div>
 
                     {/* ── Max Lessons ─────────────────────────────────── */}
                     <Section>
@@ -315,8 +347,7 @@ export default function TimetableSettings({ isOpen, onClose }: TimetableSettings
                             title="First Lesson Starts At"
                             subtitle="Earliest time slot available"
                         />
-                        <PillSelect
-                            options={startTimeOptions}
+                        <TimePicker
                             value={draft.firstLessonStartTime}
                             onChange={v => updateDraft({ firstLessonStartTime: v })}
                         />
@@ -360,22 +391,21 @@ export default function TimetableSettings({ isOpen, onClose }: TimetableSettings
                             icon={<IconCircle color="#EF4444"><Trash2 size={16} color="#EF4444" /></IconCircle>}
                             title="Danger Zone"
                             subtitle="Irreversible actions"
-                            titleColor="#EF4444"
                         />
-                        <div className="flex flex-col gap-2.5">
+                        <div className="flex flex-col-reverse gap-2.5">
                             <DangerAction
                                 icon={<RotateCcw size={16} color="#EF4444" />}
                                 title="Reset Entire Timetable"
                                 subtitle="Erases all lessons and returns to setup"
                                 color="#EF4444"
-                                onClick={() => resetTimetable(onClose)}
+                                onClick={handleReset}
                             />
                             <DangerAction
                                 icon={<Trash2 size={16} color="#F59E0B" />}
                                 title="Clear All Lessons"
                                 subtitle="Removes lessons but keeps your settings"
                                 color="#F59E0B"
-                                onClick={clearAllLessons}
+                                onClick={handleClearLessons}
                             />
                         </div>
                     </Section>
@@ -383,23 +413,27 @@ export default function TimetableSettings({ isOpen, onClose }: TimetableSettings
                     <div className="h-4" />
                 </div>
 
-                {/* ── Sticky Save Bar ─────────────────────────────────────── */}
+                {/* ── Sticky Save Bar ─────────────────────────────────────────────────── */}
                 <div
-                    className={`flex-shrink-0 px-4 py-3 border-t border-(--border-main) bg-(--bg-card)
-                        transition-all duration-300 ${
-                            hasChanges
-                                ? 'opacity-100 translate-y-0'
-                                : 'opacity-0 translate-y-2 pointer-events-none'
+                    className={`shrink-0 px-4 py-3 border-t border-(--border-main) bg-(--bg-card)
+                        transition-all duration-300 ${canSave
+                            ? 'opacity-100 translate-y-0'
+                            : 'opacity-0 translate-y-2 pointer-events-none'
                         }`}
                 >
                     <button
                         type="button"
                         onClick={handleSave}
-                        className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-xl bg-primary text-white font-semibold text-[15px]
-                            hover:opacity-90 active:scale-[0.98] transition-all duration-200 cursor-pointer shadow-md"
+                        disabled={isSaving || !canSave}
+                        className={`w-full flex items-center justify-center gap-2.5 py-3.5 rounded-xl font-semibold text-[15px]
+                            transition-all duration-200 shadow-md ${
+                                !canSave
+                                    ? 'bg-gray-200 text-gray-400 pointer-events-none'
+                                    : 'bg-primary text-white hover:opacity-90 active:scale-[0.98] cursor-pointer'
+                            } ${isSaving ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
                         <Save size={18} />
-                        Save Changes
+                        {isSaving ? 'Saving...' : 'Save Changes'}
                     </button>
                 </div>
             </div>

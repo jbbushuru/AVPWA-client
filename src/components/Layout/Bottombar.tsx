@@ -12,11 +12,10 @@ export default function BottomNav() {
     { label: 'Units', icon: BookOpen, href: '/units' },
     { label: 'Timetable', icon: CalendarClock, href: '/timetable' },
     { label: 'Tasks', icon: ClipboardCheck, href: '/tasks' },
-    { label: 'Account', icon: User, href: '/account' },
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-bg-main border-t border-[#D8CCD9] z-40 px-3 py-2 flex justify-around items-center">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#eeede4] border-t border-[#D8CCD9] z-40 px-3 py-2 flex justify-around items-center">
       {navItems.map((item) => {
         const Icon = item.icon;
         return (

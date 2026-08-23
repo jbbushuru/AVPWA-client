@@ -9,13 +9,13 @@ export default function ViewToggle({ activeView, onViewChange }: ViewToggleProps
     return (
         <div className="flex items-center justify-between">
             {/* View Mode Switcher */}
-            <div className="flex items-center p-1.5 bg-primary/25 border border-(--border-main) rounded-full select-none gap-1">
+            <div className="flex items-center p-1.5 max-md:p-1 bg-primary/25 border border-(--border-main) rounded-full select-none gap-1">
                 <button
                     type="button"
                     onClick={() => onViewChange("Daily")}
-                    className={`px-10 pb-0.5 pt-1 text-center font-sister text-md font-normal tracking-widest rounded-full transition-all duration-300 ease-in-out cursor-pointer border ${
+                    className={`px-10 max-md:py-2 pb-0.5 pt-1 text-center font-sister text-md max-md:text-xs font-normal tracking-widest rounded-full transition-all duration-300 ease-in-out cursor-pointer  ${
                         activeView === "Daily"
-                            ? "bg-(--bg-card) text-(--text-main) border-(--border-main)/60 shadow-xs"
+                            ? "bg-primary text-white "
                             : "bg-transparent text-(--text-muted) border-transparent shadow-none hover:text-(--text-main)"
                     }`}
                 >
@@ -24,9 +24,9 @@ export default function ViewToggle({ activeView, onViewChange }: ViewToggleProps
                 <button
                     type="button"
                     onClick={() => onViewChange("Weekly")}
-                    className={`px-10 pb-0.5 pt-1 text-center font-sister text-md font-normal tracking-widest rounded-full transition-all duration-300 ease-in-out cursor-pointer border ${
+                    className={`px-10 max-md:py-2 pb-0.5 pt-1 text-center font-sister text-md max-md:text-xs font-normal tracking-widest rounded-full transition-all duration-300 ease-in-out cursor-pointer ${
                         activeView === "Weekly"
-                            ? "bg-(--bg-card) text-(--text-main) border-(--border-main)/60 shadow-xs"
+                            ? "bg-primary text-white "
                             : "bg-transparent text-(--text-muted) border-transparent shadow-none hover:text-(--text-main)"
                     }`}
                 >

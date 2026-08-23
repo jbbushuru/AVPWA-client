@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { getSummary, GradeSummary, StrengthDistribution } from '../services/unitService';
+import { getTimetableSettings, TimetableSettings } from '../services/timetableService';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 // Define context state and function types
 export interface AppContextType {
@@ -14,6 +16,10 @@ export interface AppContextType {
   gradeDistribution: GradeSummary[] | null;
   strengthDistribution: StrengthDistribution[] | null;
   fetchUnitsSummary: () => Promise<void>;
+  settings: TimetableSettings | null;
+  isAlreadySetup: boolean;
+  setSettings: (settings: TimetableSettings | null) => void;
+  fetchUserSettings: () => Promise<void>;
 }
 
 // Create context with default undefined value
@@ -27,20 +33,50 @@ interface AppProviderProps {
 // AppProvider component
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [user, setUser] = useState<any | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [activeView, setActiveView] = useState<string>('Daily');
-  const [gradeDistribution, setGradeDistribution] = useState<GradeSummary[] | null>(null);
-  const [strengthDistribution, setStrengthDistribution] = useState<StrengthDistribution[] | null>(null);
 
-  const fetchUnitsSummary = async () => {
-    const summary = await getSummary();
-    setGradeDistribution(summary.stats);
-    setStrengthDistribution(summary.strengths);
+  const queryClient = useQueryClient();
+
+  const { data: summaryData, isLoading: isSummaryLoading, refetch: fetchUnitsSummary } = useQuery({
+    queryKey: ['unitsSummary'],
+    queryFn: getSummary,
+  });
+
+  const gradeDistribution = summaryData?.stats || null;
+  const strengthDistribution = summaryData?.strengths || null;
+
+  const { 
+    data: settingsData, 
+    isLoading: isSettingsLoading, 
+    error: settingsError, 
+    refetch: fetchUserSettingsQuery 
+  } = useQuery({
+    queryKey: ['timetableSettings'],
+    queryFn: getTimetableSettings,
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 404) return false;
+      return failureCount < 1;
+    }
+  });
+
+  const isLoading = isSummaryLoading || isSettingsLoading;
+  
+  // Set setup status based on 404 error
+  const isAlreadySetup = settingsData ? true : (settingsError as any)?.response?.status === 404 ? false : !!settingsData;
+  const settings = (settingsData as TimetableSettings) || null;
+
+  const setSettings = (newSettings: TimetableSettings | null) => {
+    // Manually push updated settings into React Query cache
+    queryClient.setQueryData(['timetableSettings'], newSettings);
   };
-  useEffect(() => {
-    fetchUnitsSummary();
-  }, []);
+
+  const setIsLoading = (loading: boolean) => {}; // No-op as requested by removing manual isLoading
+
+  const fetchUserSettings = async () => {
+    // Force a fresh request from backend
+    await queryClient.invalidateQueries({ queryKey: ['timetableSettings'] });
+  };
 
   const value: AppContextType = {
     user,
@@ -53,7 +89,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setActiveView,
     gradeDistribution,
     strengthDistribution,
-    fetchUnitsSummary,
+    fetchUnitsSummary: async () => { await fetchUnitsSummary(); },
+    settings,
+    isAlreadySetup,
+    setSettings,
+    fetchUserSettings
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

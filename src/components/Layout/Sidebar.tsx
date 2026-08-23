@@ -53,7 +53,7 @@ export default function Sidebar() {
         </nav>
 
         {/* Academic Years */}
-        <div>
+        {/* <div>
           <h3 className="text-gray-300 text-xs font-semibold uppercase tracking-wider mb-3">Academic Years</h3>
           <ul className="space-y-1.5">
             {academicYears.map((yearItem) => {
@@ -77,7 +77,7 @@ export default function Sidebar() {
               );
             })}
           </ul>
-        </div>
+        </div> */}
     </aside>
   );
 }

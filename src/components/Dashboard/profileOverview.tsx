@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 export default function ProfileOverview() {
   const { profile } = useAuth();
   return (
-    <div>
+    <div className='hidden md:block'>
       {/* Main card */}
       <div className="flex flex-row gap-4 items-center  text-slate-800  px-4 border-l-4 border-primary">
         {/* User Information */}

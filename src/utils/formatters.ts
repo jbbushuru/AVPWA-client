@@ -39,3 +39,10 @@ export function getFormattedDuration(duration: number) {
     const minutes = duration % 60;
     return `${hours}h ${minutes}m`;
 }
+export function formatTime(totalMins: number) {
+    const h24 = Math.floor(totalMins / 60) % 24;
+    const m = totalMins % 60;
+    const ampm = h24 >= 12 ? 'PM' : 'AM';
+    const h12 = h24 % 12 || 12;
+    return `${h12.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} ${ampm}`;
+}

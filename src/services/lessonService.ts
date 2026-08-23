@@ -20,3 +20,7 @@ export const createLesson = async(lessonData:Lesson)=>{
     const {data} = await api.post('/lessons',lessonData)
     return data;
 }
+
+export const deleteAllLessons = async (): Promise<void> => {
+    await api.delete('/lessons');
+}
