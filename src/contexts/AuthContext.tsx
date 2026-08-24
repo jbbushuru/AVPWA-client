@@ -63,8 +63,6 @@ useEffect(() => {
   // };
 
   const init = async () => {
-    setIsLoading(true);
-
     // 1. Skip auth checks if user is on login/register pages
     const publicPaths = PUBLIC_PATHS;
     if (publicPaths.includes(window.location.pathname)) {
