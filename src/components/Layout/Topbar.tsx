@@ -7,7 +7,7 @@ export default function Topbar(){
         <div className="md:hidden flex items-center pl-2 py-3 justify-between bg-[#eeede4] border-b border-[#D8CCD9]">
             {/* Circular AV Logo Badge */}
             <div className="flex flex-row items-center gap-1">
-            <img src="./public/favicon.png" alt="AV Logo" className="w-6 h-6 rounded-full" />
+            <img src="./favicon.png" alt="AV Logo" className="w-6 h-6 rounded-full" />
             <p className="text-primary text-[12px] font-sister tracking-wide">AcademicVault</p>
             </div>
             

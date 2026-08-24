@@ -90,7 +90,6 @@ useEffect(() => {
 
   // 2. Login Flow
   const login = async (credentials: LoginDTO) => {
-    setIsLoading(true);
     try {
       const data = await userService.login(credentials);
       setUser({ id: data.userId });
@@ -102,7 +101,6 @@ useEffect(() => {
 
   // 3. Register Flow
   const register = async (credentials: RegisterDTO) => {
-    setIsLoading(true);
     try {
       const data = await userService.register(credentials);
       setUser({ id: data.userId });
@@ -114,7 +112,6 @@ useEffect(() => {
 
   // 4. Logout Flow
   const logout = async () => {
-    setIsLoading(true);
     try {
       await userService.logout();
     } finally {
