@@ -2,9 +2,9 @@ import {
   LayoutDashboard, 
   BookOpen, 
   CalendarClock, 
-  ClipboardCheck, 
-  User 
+  ClipboardCheck 
 } from 'lucide-react';
+import { NavLink } from 'react-router-dom'; // 1. Import NavLink
 
 export default function BottomNav() {
   const navItems = [
@@ -19,14 +19,23 @@ export default function BottomNav() {
       {navItems.map((item) => {
         const Icon = item.icon;
         return (
-          <a
+          <NavLink
             key={item.label}
-            href={item.href}
-            className="flex flex-col items-center justify-center py-1 text-[#4A324C] hover:text-primary transition-colors"
+            to={item.href}
+            end={item.href === '/'}
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center py-1 transition-colors ${
+                isActive ? 'text-primary font-bold' : 'text-[#4A324C] hover:text-primary'
+              }`
+            }
           >
-            <Icon className="w-5 h-5 text-primary" />
-            <span className="text-[10px] mt-1 font-medium">{item.label}</span>
-          </a>
+            {({ isActive }) => (
+              <>
+                <Icon className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-[#4A324C]'}`} />
+                <span className="text-[10px] mt-1 font-medium">{item.label}</span>
+              </>
+            )}
+          </NavLink>
         );
       })}
     </nav>
