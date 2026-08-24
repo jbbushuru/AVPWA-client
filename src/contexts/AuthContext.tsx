@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { userService, LoginDTO, RegisterDTO } from '../services/userService';
 import { profileService, Profile } from '../services/profileService';
 import { setAccessToken } from '../services/api';
+import {PUBLIC_PATHS} from '../constants/constants';
 
 interface User {
   id: string;
@@ -25,7 +26,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Helper to load user profile overview (slim data for auth context)
   const fetchProfile = async () => {
     try {
       const userProfile = await profileService.getMyProfile();
@@ -38,27 +38,50 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // 1. Silent Auth Hydration on App Mount / Page Refresh
 useEffect(() => {
+  // const init = async () => {
+  //   setIsLoading(true);
+
+  //   try {
+  //     // if (import.meta.env.DEV) {
+  //     //   // 1. DEV MODE: Skip refresh token check, directly load profile using mock bypass
+  //     //   const userProfile = await profileService.getMyProfile();
+  //     //   setProfile(userProfile);
+  //     //   setUser({ id: '6a8426fedeb52eb769292cbe' }); // Set mock user so app knows you're logged in
+  //     // } else {
+  //       // 2. PRODUCTION MODE: Full auth hydration flow
+  //       await userService.checkAuthStatus();
+  //       await fetchProfile();
+  //     // }
+  //   } catch (error) {
+  //     console.error('Auth initialization error:', error);
+  //     setAccessToken(null);
+  //     setUser(null);
+  //     setProfile(null);
+  //   } finally {
+  //     setIsLoading(false); // ALWAYS runs to unblock the UI
+  //   }
+  // };
+
   const init = async () => {
     setIsLoading(true);
 
+    // 1. Skip auth checks if user is on login/register pages
+    const publicPaths = PUBLIC_PATHS;
+    if (publicPaths.includes(window.location.pathname)) {
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      if (import.meta.env.DEV) {
-        // 1. DEV MODE: Skip refresh token check, directly load profile using mock bypass
-        const userProfile = await profileService.getMyProfile();
-        setProfile(userProfile);
-        setUser({ id: '6a8426fedeb52eb769292cbe' }); // Set mock user so app knows you're logged in
-      } else {
-        // 2. PRODUCTION MODE: Full auth hydration flow
-        await userService.checkAuthStatus();
-        await fetchProfile();
-      }
+      await userService.checkAuthStatus();
+      await fetchProfile();
     } catch (error) {
       console.error('Auth initialization error:', error);
       setAccessToken(null);
       setUser(null);
       setProfile(null);
     } finally {
-      setIsLoading(false); // ALWAYS runs to unblock the UI
+      setIsLoading(false);
     }
   };
 

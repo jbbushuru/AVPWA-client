@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { getSummary, GradeSummary, StrengthDistribution } from '../services/unitService';
 import { getTimetableSettings, TimetableSettings } from '../services/timetableService';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from './AuthContext';
 
 // Define context state and function types
 export interface AppContextType {
@@ -37,10 +38,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [activeView, setActiveView] = useState<string>('Daily');
 
   const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuth();
 
   const { data: summaryData, isLoading: isSummaryLoading, refetch: fetchUnitsSummary } = useQuery({
     queryKey: ['unitsSummary'],
     queryFn: getSummary,
+    enabled: isAuthenticated,
   });
 
   const gradeDistribution = summaryData?.stats || null;
@@ -54,6 +57,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   } = useQuery({
     queryKey: ['timetableSettings'],
     queryFn: getTimetableSettings,
+    enabled: isAuthenticated,
     retry: (failureCount, error: any) => {
       if (error?.response?.status === 404) return false;
       return failureCount < 1;

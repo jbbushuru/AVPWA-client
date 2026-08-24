@@ -33,10 +33,20 @@ const MAX_RETRIES = 2;
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Attach clean message directly to the error object
+    if (error.response?.data?.message) {
+      error.customMessage = error.response.data.message;
+    }
+
     const originalRequest = error.config;
 
-    // 1. Bail out immediately if the failed endpoint WAS refresh-token itself
-    if (originalRequest.url?.includes('/refresh-token')) {
+    // 1. Never attempt to refresh if the failed request was login, register, or refresh-token
+    const isAuthEndpoint =
+      originalRequest.url?.includes('/refresh-token') ||
+      originalRequest.url?.includes('/login') ||
+      originalRequest.url?.includes('/register');
+
+    if (isAuthEndpoint) {
       return Promise.reject(error);
     }
 
