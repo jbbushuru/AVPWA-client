@@ -1,14 +1,17 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import AddLesson from "./AddLesson";
 import { PlusCircle } from "lucide-react";
 import { Lesson as APILesson } from "../../services/lessonService";
 import { useApp } from "../../contexts/AppContext";
 import { useLessons } from "../../hooks/useLessons";
+import { useActiveLessonTimer } from "../../hooks/useActiveLessonTimer";
+import { isLessonOngoing } from "../../utils/getOngoingStatus";
+import { EmptySlot, LessonCard } from "./LessonCards";
 
 const LessonCounter = ({ count }: { count: number }) => {
     const { settings } = useApp();
     const slots = settings?.maxLessons;
-    const lessonSlots = [...Array(slots? slots : 5)];
+    const lessonSlots = [...Array(slots ? slots : 5)];
 
     return (
         <div className="flex items-center justify-between w-full">
@@ -21,43 +24,24 @@ const LessonCounter = ({ count }: { count: number }) => {
                 {lessonSlots.map((_, i) => (
                     <div
                         key={i}
-                        className={`h-1.5 max-md:h-1 w-full rounded-full transition-colors duration-200 ${
-                            i < count ? "bg-primary" : "bg-gray-300"
-                        }`}
+                        className={`h-1.5 max-md:h-1 w-full rounded-full transition-colors duration-200 ${i < count ? "bg-primary" : "bg-gray-300"
+                            }`}
                     />
                 ))}
             </div>
         </div>
     )
 }
-const EmptySlot = ({ onClick }: { onClick: () => void }) => {
+const DailyLessonTask = () => {
     return (
         <button
             type="button"
-            onClick={onClick}
-            className="flex-1 w-full flex flex-row items-center justify-center gap-2 py-8 max-md:py-6 rounded-md max-md:rounded-xl border-2 border-dashed border-primary hover:bg-primary/10 text-neutral-600 hover:text-neutral-800 transition-colors cursor-pointer"
+            onClick={() => alert('Not Implemented yet!')}
+            className="flex-1 w-full flex flex-row items-center justify-center gap-2 py-8 max-md:py-6 rounded-md max-md:rounded-xl border border-dashed border-primary hover:bg-primary/10 text-neutral-600 hover:text-neutral-800 transition-colors cursor-pointer"
         >
-            <PlusCircle className="w-6 h-6 stroke-[1.5] stroke-primary" />
-            <span className="font-sister text-md text-primary tracking-wide">Add Lesson</span>
+            <PlusCircle className="w-4 h-4 md:w-6 md:h-6 stroke-1 md:stroke-[1.5] stroke-primary" />
+            <span className="max-md:hidden font-sister text-md text-primary tracking-wide">Add Task</span>
         </button>
-    );
-};
-
-const LessonCard = ({ lesson }: { lesson: APILesson }) => {
-    return (
-        <div className="flex-1 p-4 rounded-md max-md:rounded-xl border-2 border-primary/20 bg-primary/5 hover:border-primary/40 transition-colors shadow-sm">
-            <h3 className="font-sister font-bold text-lg text-primary">{lesson.unitName}</h3>
-            <p className="text-sm font-medium text-neutral-700 mt-1">{lesson.time} <span className="text-neutral-400 mx-1">|</span> {lesson.venue}</p>
-            <p className="text-sm text-neutral-500 mt-0.5">{lesson.lecturer}</p>
-        </div>
-    );
-};
-
-const DailyLessonTask = () => {
-    return (
-        <div className="p-4 rounded-md max-md:rounded-xl border-2 border-neutral-200 bg-white shadow-sm flex flex-col items-center justify-center text-neutral-400 hover:border-primary/30 transition-colors cursor-pointer">
-            <span className="font-sister tracking-wide">Tasks</span>
-        </div>
     )
 }
 
@@ -65,6 +49,7 @@ function DailyLessons({ date, lessons }: { date: Date; lessons: APILesson[] }) {
     const { settings } = useApp();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedSlot, setSelectedSlot] = useState(0);
+    const currentTime = useActiveLessonTimer();
 
     const { invalidateLessons } = useLessons();
 
@@ -89,13 +74,13 @@ function DailyLessons({ date, lessons }: { date: Date; lessons: APILesson[] }) {
                     <div key={slot}>
                         {lesson ? (
                             <div className="grid grid-cols-[3fr_1fr] gap-3">
-                            <LessonCard lesson={lesson} />
-                            <DailyLessonTask />
+                                <LessonCard lesson={lesson} date={date} currentTime={currentTime} view="daily" />
+                                <DailyLessonTask />
                             </div>
                         ) : (
                             <EmptySlot onClick={() => handleAddClick(slot)} />
                         )}
-                        
+
                     </div>
                 );
             })}
@@ -159,7 +144,7 @@ export default function Daily({ date }: { date: Date }) {
     }, [allLessons, date]);
 
     return (
-        <div className="flex flex-col gap-6 max-md:gap-4">
+        <div className="flex flex-col gap-6 max-md:gap-4 max-md:pb-15">
             <LessonCounter count={lessons.length} />
             <DailyLessons date={date} lessons={lessons} />
         </div>

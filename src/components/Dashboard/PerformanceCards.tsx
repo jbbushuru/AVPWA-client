@@ -46,7 +46,7 @@ export const AptitudeCard: React.FC<AptitudeCardProps> = ({
             {title}
           </span>
           <span
-            className={`font-['LoveYa'] text-[17px] leading-tight truncate ${
+            className={`font-sister text-md md:text-[17px] leading-tight truncate ${
               isStrength ? 'text-[#15803d]' : 'text-[#9a3412]'
             }`}
           >

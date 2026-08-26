@@ -20,7 +20,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="hidden md:flex flex-col w-64 p-6 px-3 gap-6 h-full bg-primary text-gray-200 shrink-0 relative z-30 shadow-lg overflow-y-auto">
+    <aside className="hidden md:flex flex-col w-64 p-6 px-3 gap-6 h-full bg-[#eeede4] text-gray-200 shrink-0 relative z-30 overflow-y-auto">
         {/* Navigation */}
         <nav>
           <ul className="space-y-1">
@@ -35,13 +35,13 @@ export default function Sidebar() {
                       `flex items-center p-2 mb-3 rounded-md transition-all duration-200 font-bold text-xs uppercase tracking-wider ${
                         isActive
                           ? 'bg-bg-main text-primary shadow-md'
-                          : 'hover:bg-[#8a5b6c]/60 text-gray-200'
+                          : 'hover:bg-[#8a5b6c]/60 text-gray-700'
                       }`
                     }
                   >
                     {({ isActive }) => (
                       <>
-                        <Icon className={`w-5 h-5 mr-3 ${isActive ? 'text-primary' : 'text-gray-300'}`} />
+                        <Icon className={`w-5 h-5 mr-3 ${isActive ? 'text-primary' : 'text-gray-800'}`} />
                         <span>{item.label}</span>
                       </>
                     )}

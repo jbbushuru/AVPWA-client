@@ -38,7 +38,7 @@ export const Stats: React.FC = () => {
     
   
   return (
-    <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-5 md:p-6 flex flex-col justify-between w-full">
+    <div className="md:bg-white md:border md:border-gray-200 md:shadow-sm md:rounded-lg md:p-6 flex flex-col justify-between w-full">
       {/* Header */}
       <div className="flex flex-row justify-between items-center mb-3 md:mb-6">
         <div className="flex items-center gap-2">
@@ -55,9 +55,9 @@ export const Stats: React.FC = () => {
         <div className="bg-linear-to-br from-[rgba(166,141,173,0.2)] to-[rgba(212,165,165,0.2)] border-[1.73px] border-[#A188A8]/50 rounded-[10px] p-[13.7px] flex flex-col gap-1 justify-between h-[83.4px]">
           <div className="flex items-center gap-2 text-[#7B5E77]">
             <Sparkles className="w-4 h-4 text-[#A188A8]" />
-            <span className="font-['Indie_Flower',cursive] text-xs leading-none">Level</span>
+            <span className="font-sister text-xs leading-none">Level</span>
           </div>
-          <div className="font-['Inter',sans-serif] font-bold text-[30px] leading-tight text-[#5C4C5F]">
+          <div className="font-['Inter',sans-serif] font-bold text-2xl md:text-[30px] leading-tight text-[#5C4C5F]">
             Year {profile?.year}
           </div>
         </div>
@@ -66,9 +66,9 @@ export const Stats: React.FC = () => {
         <div className="bg-linear-to-br from-[rgba(238,215,161,0.3)] to-[rgba(181,201,195,0.2)] border-[1.73px] border-[#879B95]/50 rounded-[10px] p-[13.7px] flex flex-col gap-1 justify-between h-[83.4px]">
           <div className="flex items-center gap-2 text-[#7B5E77]">
             <BookOpen className="w-4 h-4 text-[#879B95]" />
-            <span className="font-['Indie_Flower',cursive] text-xs leading-none">Sublevel</span>
+            <span className="font-sister text-xs leading-none">Sublevel</span>
           </div>
-          <div className="font-['Inter',sans-serif] font-bold text-[30px] leading-tight text-[#5C4C5F]">
+          <div className="font-['Inter',sans-serif] font-bold text-2xl md:text-[30px] leading-tight text-[#5C4C5F]">
             {getSublevel(profile?.academicSystem,profile?.term)}
           </div>
         </div>
@@ -77,9 +77,9 @@ export const Stats: React.FC = () => {
         <div className="bg-linear-to-br from-[rgba(238,215,161,0.3)] to-[rgba(215,168,14,0.2)] border-[1.73px] border-[#D7A80E]/50 rounded-[10px] p-[13.7px] flex flex-col gap-1 justify-between h-[83.4px]">
           <div className="flex items-center gap-2 text-[#7B5E77]">
             <BookOpen className="w-4 h-4 text-[#D7A80E]" />
-            <span className="font-['Indie_Flower',cursive] text-xs leading-none">Units Completed</span>
+            <span className="font-sister text-xs leading-none">Units Completed</span>
           </div>
-          <div className="font-['Inter',sans-serif] font-bold text-[30px] leading-tight text-[#D7A80E] text-center">
+          <div className="font-['Inter',sans-serif] font-bold text-2xl md:text-[30px] leading-tight text-[#D7A80E] text-center">
             0
           </div>
         </div>
@@ -88,9 +88,9 @@ export const Stats: React.FC = () => {
         <div className="bg-linear-to-br from-[rgba(169,222,217,0.22)] to-[rgba(76,138,234,0.2)] border-[1.73px] border-[#2B7FFF]/40 rounded-[10px] p-[13.7px] flex flex-col gap-1 justify-between h-[83.4px]">
           <div className="flex items-center gap-2 text-[#7B5E77]">
             <Ribbon className="w-4 h-4 text-[#1B61CD]" />
-            <span className="font-['Indie_Flower',cursive] text-xs leading-none">Performance</span>
+            <span className="font-sister text-xs leading-none">Performance</span>
           </div>
-          <div className="font-['Inter',sans-serif] font-bold text-[30px] leading-tight text-[#1B61CD]">
+          <div className="font-['Inter',sans-serif] font-bold text-2xl md:text-[30px] leading-tight text-[#1B61CD]">
             0.0/12
           </div>
         </div>
@@ -105,12 +105,12 @@ export const Stats: React.FC = () => {
               Scholar Chapters
             </span>
           </div>
-          <span className="font-['Inter',sans-serif] font-semibold text-base text-black">
+          <span className="font-['Inter',sans-serif] font-semibold text-sm md:text-base text-black">
             {scholarChapters}
           </span>
         </div>
         {/* Bar */}
-        <div className="w-full h-2.5 bg-[#DDBCDB] rounded-full overflow-hidden">
+        <div className="w-full h-1 md:h-2.5 bg-[#DDBCDB] rounded-full overflow-hidden">
           <div className="h-full bg-[#6E536D] rounded-full transition-all duration-500" style={{ width: `${scholarChaptersPercent}%` }} />
         </div>
       </div>

@@ -16,15 +16,21 @@ function StrengthItem({ str }: { str: any }) {
         style={{backgroundColor: `${str.signatureColor}50`}}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className="uppercase text-gray-700 font-medium">
+        <span className="uppercase text-gray-700 font-medium max-md:text-xs max-md:font-bold line-clamp-1">
           {str.categoryName}
         </span>
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full">
+          <span className="max-md:hidden md:block text-xs font-semibold px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full">
             Avg: &nbsp;&nbsp;{str.averageGrade}
           </span>
-          <span className="text-xs font-bold text-gray-500">
+          <span className="md:hidden text-[10px] font-semibold px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-full">
+            {str.averageGrade}
+          </span>
+          <span className="max-md:hidden md:block text-xs font-bold text-gray-500">
             ({str.units.length} {str.units.length === 1 ? "unit" : "units"})
+          </span>
+          <span className="md:hidden text-xs font-bold text-gray-500">
+            ({str.units.length})
           </span>
           <ChevronDown
             className={`w-4 h-4 text-gray-500 transition-transform ${
@@ -63,7 +69,7 @@ function Card({term, strengths}: StrengthTerm){
     const system = profile?.academicSystem;
     
     return (
-      <div className="p-2.5">
+      <div>
         <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 block mb-2">
           {system === "Semester" ? "Sem" : "Term"} {term}
         </span>
@@ -96,10 +102,10 @@ export default function StrengthEvolutionTimeline() {
         <div className="flex items-center gap-2 mb-1">
           <Dumbbell className="text-blue-500 w-6 h-6"/>
           <div className="flex flex-col">
-          <h1 className="text-2xl  font-sister text-gray-800 tracking-wide">
+          <h1 className=" md:text-2xl  font-sister text-gray-800 tracking-wide">
             Strength Evolution Timeline
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-xs md:text-sm text-gray-500">
           How your primary strengths changed over time
           </p>
           </div>
@@ -110,7 +116,7 @@ export default function StrengthEvolutionTimeline() {
       {/* Vertical Timeline Container */}
       <div className="relative pl-6 space-y-6">
         {/* Continuous Vertical Connector Line */}
-        <div className="absolute left-3 top-3 bottom-8 w-[2px] bg-gray-200 -z-0" />
+        <div className="absolute left-[13px]  top-3 bottom-8 w-[2px] bg-gray-200 -z-0" />
 
         {allYears.map((yearNum) => {
           const yearData = dataMap.get(yearNum);
@@ -139,7 +145,7 @@ export default function StrengthEvolutionTimeline() {
                 {/* Year Badge Header */}
                 <div className="flex items-center gap-1">
                   <span
-                    className={`text-md font-sister ${
+                    className={`text-sm md:text-md font-sister ${
                       isCurrent ? "text-primary" : "text-gray-400"
                     }`}
                   >
@@ -154,7 +160,7 @@ export default function StrengthEvolutionTimeline() {
 
                 {/* Card Content Body */}
                 {!hasData ? (
-                  <p className="text-gray-700 font-medium text-base py-1">
+                  <p className="text-gray-700 font-medium md:text-base text-xs py-1">
                     No units recorded yet
                   </p>
                 ) : (

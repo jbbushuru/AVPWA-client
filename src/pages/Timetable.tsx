@@ -63,7 +63,7 @@ export default function Timetable() {
                     <Daily date={date} />
                 )}
                 {view === "Weekly" && (
-                    <Weekly />
+                    <Weekly date={date}/>
                 )}
                 <div>
 
@@ -71,7 +71,7 @@ export default function Timetable() {
             </div>
             {/* Mobile Buttons */}
             <div className="fixed bottom-20 right-6 flex justify-between items-center md:hidden ">
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
                     <ActionButton
                         icon={Upload}
                         bgColor='bg-primary hover:opacity-60'

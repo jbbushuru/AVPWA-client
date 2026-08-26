@@ -8,7 +8,7 @@ import ProfileOverview from "../components/Dashboard/profileOverview";
 export default function Dashboard() {
 
     return (
-    <div className="flex flex-col gap-3 md:gap-6 ">
+    <div className="flex flex-col gap-3 md:gap-6 max-md:pb-16">
         <div className="flex flex-row justify-between items-center">
             <Greeting/>
             <ProfileOverview/>    

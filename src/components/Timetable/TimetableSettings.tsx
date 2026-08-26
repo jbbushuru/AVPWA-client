@@ -273,7 +273,7 @@ export default function Timetable_Settings({ isOpen, onClose }: TimetableSetting
     };
 
     // Option arrays
-    const maxLessonOptions = [3, 4, 5, 6, 7, 8].map(n => ({ label: `${n}`, value: n }));
+    const maxLessonOptions = [1,2,3, 4, 5, 6, 7, 8].map(n => ({ label: `${n}`, value: n }));
     const durationOptions = [1, 2, 3].map(n => ({ label: `${n}h`, value: n }));
     const leadTimeOptions = [5, 10, 15, 30, 60].map(m => ({ label: `${m} min`, value: m }));
 
