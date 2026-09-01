@@ -9,18 +9,14 @@ export default function Dashboard() {
 
     return (
     <div className="flex flex-col gap-3 md:gap-6 ">
-        <div className="flex flex-row justify-between items-center">
-            <Greeting/>
-            <ProfileOverview/>    
-        </div>
-        
+        <Greeting/>     
         <div className="grid grid-cols-1 md:grid-cols-[3fr_1fr] gap-4 ">
             <Stats />
-            <AcademicCompass />
+            <div>
+            <PerformanceCards/>
+            </div>
         </div>
-        <PerformanceCards/>
-        <PerformanceGraph />
-        
+        <PerformanceGraph /> 
     </div>
     )
 }
