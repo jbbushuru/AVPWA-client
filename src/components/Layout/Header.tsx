@@ -9,7 +9,7 @@ export default function Header() {
     const [isHoveringToggle, setIsHoveringToggle] = useState(false);
     const {profile} = useAuth();
     return (
-        <div className="flex items-center justify-between py-2 px-6 pl-3 gap-3 bg-white shadow-sm border-b border-slate-200">
+        <div className="flex md:hidden items-center justify-between py-2 px-6 pl-3 gap-3 bg-white shadow-sm border-b border-slate-200">
           <div className="flex gap-3">
           <div
           className={`flex items-center ${!isCollapsed ? 'justify-between' : 'justify-center'} p-3 gap-3 font-bold text-xs uppercase tracking-wider cursor-pointer text-primary`}
