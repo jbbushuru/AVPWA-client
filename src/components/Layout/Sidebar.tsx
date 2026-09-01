@@ -1,16 +1,10 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, BookOpen, Lock, CalendarClock, ClipboardCheck} from 'lucide-react';
+import { useApp } from '../../contexts/AppContext';
 
 export default function Sidebar() {
-  const [selectedYear, setSelectedYear] = useState('Year 1');
-
-  const academicYears = [
-    { name: 'Year 1', locked: false },
-    { name: 'Year 2', locked: true },
-    { name: 'Year 3', locked: true },
-    { name: 'Year 4', locked: true },
-  ];
+  const {isCollapsed, setIsCollapsed} = useApp();
 
   const navItems = [
     { label: 'Dashboard', icon: LayoutDashboard, href: '/' },
@@ -20,7 +14,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="hidden md:flex flex-col w-64 p-6 px-3 gap-6 h-full bg-[#eeede4] text-gray-200 shrink-0 relative z-30 overflow-y-auto">
+    <aside className="hidden md:flex flex-col p-3 gap-3 h-full bg-white shrink-0 relative z-30 shadow-lg overflow-y-auto">
         {/* Navigation */}
         <nav>
           <ul className="space-y-1">
@@ -32,17 +26,17 @@ export default function Sidebar() {
                     to={item.href}
                     end={item.href === '/'}
                     className={({ isActive }) =>
-                      `flex items-center p-2 mb-3 rounded-md transition-all duration-200 font-bold text-xs uppercase tracking-wider ${
+                      `flex items-center p-2 px-3 mb-3 rounded-md transition-all duration-200 font-semibold text-xs uppercase tracking-wider ${
                         isActive
-                          ? 'bg-bg-main text-primary shadow-md'
-                          : 'hover:bg-[#8a5b6c]/60 text-gray-700'
+                          ? 'bg-primary text-white shadow-md'
+                          : 'hover:bg-[#8a5b6c]/30 text-gray-800'
                       }`
                     }
                   >
                     {({ isActive }) => (
                       <>
-                        <Icon className={`w-5 h-5 mr-3 ${isActive ? 'text-primary' : 'text-gray-800'}`} />
-                        <span>{item.label}</span>
+                        <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-gray-800'}`} />
+                       { !isCollapsed && <span className='ml-3'>{item.label}</span>}
                       </>
                     )}
                   </NavLink>

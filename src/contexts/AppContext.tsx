@@ -21,6 +21,8 @@ export interface AppContextType {
   isAlreadySetup: boolean;
   setSettings: (settings: TimetableSettings | null) => void;
   fetchUserSettings: () => Promise<void>;
+  isCollapsed: boolean;
+  setIsCollapsed: (isCollapsed: boolean) => void;
 }
 
 // Create context with default undefined value
@@ -36,7 +38,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [user, setUser] = useState<any | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [activeView, setActiveView] = useState<string>('Daily');
-
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const queryClient = useQueryClient();
   const { isAuthenticated } = useAuth();
 
@@ -97,7 +99,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     settings,
     isAlreadySetup,
     setSettings,
-    fetchUserSettings
+    fetchUserSettings,
+    isCollapsed,
+    setIsCollapsed
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

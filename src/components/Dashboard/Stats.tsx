@@ -40,7 +40,7 @@ export const Stats: React.FC = () => {
   return (
     <div className="md:bg-white md:border md:border-gray-200 md:shadow-sm md:rounded-lg md:p-6 flex flex-col justify-between w-full">
       {/* Header */}
-      <div className="flex flex-row justify-between items-center mb-3 md:mb-6">
+      <div className="flex flex-row justify-between items-center mb-3">
         <div className="flex items-center gap-2">
           <Swords className="w-4 md:w-6 h-4 md:h-6 text-[#A188A8]" />
           <h2 className="font-sister text-lg md:text-xl text-black font-normal leading-7">
@@ -50,7 +50,7 @@ export const Stats: React.FC = () => {
       </div>
 
       {/* Cards Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4">
         {/* Card 1: Level */}
         <div className="bg-linear-to-br from-[rgba(166,141,173,0.2)] to-[rgba(212,165,165,0.2)] border-[1.73px] border-[#A188A8]/50 rounded-[10px] p-[13.7px] flex flex-col gap-1 justify-between h-[83.4px]">
           <div className="flex items-center gap-2 text-[#7B5E77]">

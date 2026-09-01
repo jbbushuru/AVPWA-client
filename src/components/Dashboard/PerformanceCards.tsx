@@ -82,7 +82,7 @@ export const AptitudeCard: React.FC<AptitudeCardProps> = ({
 
 export const PerformanceCards: React.FC = () => {
   return (
-    <div className="flex flex-col md:flex-row gap-4 w-full">
+    <div className="flex flex-col gap-4 w-full">
       <AptitudeCard
         title="Top Strength Area"
         icon={Award}
@@ -94,6 +94,12 @@ export const PerformanceCards: React.FC = () => {
         icon={AlertTriangle}
         category="Applied Mathematics"
         categoryPoints={-3}
+      />
+      <AptitudeCard
+        title="Top Strength Area"
+        icon={Award}
+        category="Computer Science"
+        categoryPoints={12}
       />
     </div>
   );
