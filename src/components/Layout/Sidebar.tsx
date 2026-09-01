@@ -26,7 +26,7 @@ export default function Sidebar() {
                     to={item.href}
                     end={item.href === '/'}
                     className={({ isActive }) =>
-                      `flex items-center p-2 px-3 mb-3 rounded-md transition-all duration-200 font-semibold text-xs uppercase tracking-wider ${
+                      `flex items-center p-2 px-3 mb-3 rounded-md transition-all duration-200 font-medium text-sm ${
                         isActive
                           ? 'bg-primary text-white shadow-md'
                           : 'hover:bg-[#8a5b6c]/30 text-gray-800'
