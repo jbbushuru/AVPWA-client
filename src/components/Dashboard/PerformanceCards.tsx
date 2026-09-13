@@ -54,28 +54,6 @@ export const AptitudeCard: React.FC<AptitudeCardProps> = ({
           </span>
         </div>
       </div>
-
-      {/* Points Badge */}
-      <div
-        className={`flex flex-row items-center px-2.5 py-1.5 rounded-[12px] shrink-0 ml-2.5 ${
-          isStrength ? 'bg-[#dcfce7]' : 'bg-[#ffedd5]'
-        }`}
-      >
-        <Medal
-          className={`w-3 h-3 mr-1 ${
-            isStrength ? 'text-[#16a34a]' : 'text-[#ea580c]'
-          }`}
-        />
-        <span
-          className={`font-['Inter',sans-serif] text-[13px] font-extrabold ${
-            isStrength ? 'text-[#166534]' : 'text-[#c2410c]'
-          }`}
-        >
-          {typeof categoryPoints === 'number' && categoryPoints > 0
-            ? `+${categoryPoints}`
-            : categoryPoints}
-        </span>
-      </div>
     </div>
   );
 };
@@ -94,12 +72,6 @@ export const PerformanceCards: React.FC = () => {
         icon={AlertTriangle}
         category="Applied Mathematics"
         categoryPoints={-3}
-      />
-      <AptitudeCard
-        title="Top Strength Area"
-        icon={Award}
-        category="Computer Science"
-        categoryPoints={12}
       />
     </div>
   );

@@ -35,6 +35,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
         borderColor: borderColor?.startsWith('#') || borderColor?.startsWith('rgb') ? borderColor : undefined,
       }}
       className={`
+        hover:cursor-pointer
         inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm
         transition-all duration-200 shadow-sm active:scale-95 border
         disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100
