@@ -21,7 +21,7 @@ function getFormattedDate() {
 export default function Greeting() {
   const {profile}=useAuth();
     return (
-    <div className="bg-transparent flex flex-col">
+    <div className="bg-transparent flex flex-col max-md:hidden">
       {/* Dynamic greeting: Good Morning/Afternoon/Evening, [First Name] */}
       <h1 className="text-xl md:text-3xl font-bold text-[#1a1a1a] tracking-tight leading-tight">
         {getGreeting()}, {profile?.firstName}

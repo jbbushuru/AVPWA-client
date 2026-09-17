@@ -5,8 +5,8 @@ import { Lesson as APILesson } from "../../services/lessonService";
 import { useApp } from "../../contexts/AppContext";
 import { useLessons } from "../../hooks/useLessons";
 import { useActiveLessonTimer } from "../../hooks/useActiveLessonTimer";
-import { isLessonOngoing } from "../../utils/getOngoingStatus";
 import { EmptySlot, LessonCard } from "./LessonCards";
+import CreateTask from "../Tasks/CreateTask";
 
 const LessonCounter = ({ count }: { count: number }) => {
     const { settings } = useApp();
@@ -32,11 +32,11 @@ const LessonCounter = ({ count }: { count: number }) => {
         </div>
     )
 }
-const DailyLessonTask = () => {
+const DailyLessonTask = ({ onAddTask }: { onAddTask: () => void }) => {
     return (
         <button
             type="button"
-            onClick={() => alert('Not Implemented yet!')}
+            onClick={onAddTask}
             className="flex-1 w-full flex flex-row items-center justify-center gap-2 py-8 max-md:py-6 rounded-md max-md:rounded-xl border border-dashed border-primary hover:bg-primary/10 text-neutral-600 hover:text-neutral-800 transition-colors cursor-pointer"
         >
             <PlusCircle className="w-4 h-4 md:w-6 md:h-6 stroke-1 md:stroke-[1.5] stroke-primary" />
@@ -51,6 +51,9 @@ function DailyLessons({ date, lessons }: { date: Date; lessons: APILesson[] }) {
     const [selectedSlot, setSelectedSlot] = useState(0);
     const currentTime = useActiveLessonTimer();
 
+    const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+    const [selectedLessonId, setSelectedLessonId] = useState<string | undefined>();
+
     const { invalidateLessons } = useLessons();
 
     const handleLessonAdded = () => {
@@ -61,6 +64,11 @@ function DailyLessons({ date, lessons }: { date: Date; lessons: APILesson[] }) {
     const handleAddClick = (slot: number) => {
         setSelectedSlot(slot);
         setIsModalOpen(true);
+    };
+
+    const handleAddTaskClick = (lessonId: string) => {
+        setSelectedLessonId(lessonId);
+        setIsTaskModalOpen(true);
     };
 
     const numSlots = settings?.maxLessons || 5;
@@ -75,7 +83,7 @@ function DailyLessons({ date, lessons }: { date: Date; lessons: APILesson[] }) {
                         {lesson ? (
                             <div className="grid grid-cols-[3fr_1fr] gap-3">
                                 <LessonCard lesson={lesson} date={date} currentTime={currentTime} view="daily" />
-                                <DailyLessonTask />
+                                <DailyLessonTask onAddTask={() => handleAddTaskClick((lesson as any)._id)} />
                             </div>
                         ) : (
                             <EmptySlot onClick={() => handleAddClick(slot)} />
@@ -90,6 +98,11 @@ function DailyLessons({ date, lessons }: { date: Date; lessons: APILesson[] }) {
                 onLessonAdded={handleLessonAdded}
                 date={date}
                 slot={selectedSlot}
+            />
+            <CreateTask 
+                isOpen={isTaskModalOpen}
+                onClose={() => setIsTaskModalOpen(false)}
+                lessonId={selectedLessonId}
             />
         </div>
     )

@@ -25,13 +25,13 @@ export default function BottomNav() {
             end={item.href === '/'}
             className={({ isActive }) =>
               `flex flex-col items-center justify-center py-1 transition-colors ${
-                isActive ? 'text-primary font-bold' : 'text-[#4A324C] hover:text-primary'
+                isActive ? 'text-primary font-bold' : 'text-slate-400'
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <Icon className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-[#4A324C]'}`} />
+                <Icon className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-slate-400'}`} />
                 <span className="text-[10px] mt-1 font-medium">{item.label}</span>
               </>
             )}
