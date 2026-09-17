@@ -29,8 +29,12 @@ const startOfDay = (d: Date) => {
 
 export function bucketTasks(tasks: Task[]): Record<Bucket, Task[]> {
   const today = startOfDay(new Date());
+
+  // Calculate Sunday as the end of the current week (23:59:59 or end of day)
+  const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday...
+  const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
   const endOfWeek = new Date(today);
-  endOfWeek.setDate(endOfWeek.getDate() + (7 - today.getDay()));
+  endOfWeek.setDate(today.getDate() + daysUntilSunday);
 
   const buckets: Record<Bucket, Task[]> = {
     overdue: [],
@@ -42,6 +46,13 @@ export function bucketTasks(tasks: Task[]): Record<Bucket, Task[]> {
   };
 
   for (const task of tasks) {
+    // 1. Handled completed tasks first regardless of due date
+    if (task.status === 'Done') {
+      buckets.done.push(task);
+      continue;
+    }
+
+    // 2. Handle tasks without a due date
     if (!task.dueDate) {
       buckets.noDueDate.push(task);
       continue;
@@ -49,20 +60,15 @@ export function bucketTasks(tasks: Task[]): Record<Bucket, Task[]> {
 
     const due = startOfDay(new Date(task.dueDate));
 
-    if (due < today && task.status !== 'Done') {
+    // 3. Bucket active tasks by due date
+    if (due < today) {
       buckets.overdue.push(task);
-    } else if (task.status !== 'Done') {
-      if (due.getTime() === today.getTime()) {
-        buckets.today.push(task);
-      } else if (due <= endOfWeek) {
-        buckets.thisWeek.push(task);
-      } else {
-        buckets.later.push(task);
-      }
-    }
-
-    if (task.status === 'Done') {
-      buckets.done.push(task);
+    } else if (due.getTime() === today.getTime()) {
+      buckets.today.push(task);
+    } else if (due <= endOfWeek) {
+      buckets.thisWeek.push(task);
+    } else {
+      buckets.later.push(task);
     }
   }
 

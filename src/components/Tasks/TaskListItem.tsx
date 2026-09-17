@@ -4,8 +4,8 @@ import { completeTask, uncompleteTask, deleteTask, updateTask } from '../../serv
 
 interface Props {
   task: Task;
-  onUpdated: () => void; // trigger parent refetch after any mutation
-  onEdit: (task: Task) => void;
+  onUpdated?: () => void; // trigger parent refetch after any mutation
+  onEdit?: (task: Task) => void;
 }
 
 const getPriorityColor= (priority:string|undefined) => {
@@ -21,6 +21,16 @@ const formatDueDate = (date: string | null) => {
   });
 };
 
+const getOverdueDays = (date: string | null): number => {
+  if (!date) return 0;
+  const due = new Date(date);
+  due.setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diff = today.getTime() - due.getTime();
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
+};
+
 export default function TaskListItem({ task, onUpdated, onEdit }: Props) {
   const isDone = task.status === 'Done';
   const priorityColor = getPriorityColor(task.priority);
@@ -31,13 +41,13 @@ export default function TaskListItem({ task, onUpdated, onEdit }: Props) {
     } else {
       await completeTask(task._id);
     }
-    onUpdated();
+    // onUpdated();
   };
 
   const handleDelete = async () => {
     if (!confirm('Delete this task?')) return;
     await deleteTask(task._id);
-    onUpdated();
+    // onUpdated();
   };
 
   return (
@@ -64,7 +74,7 @@ export default function TaskListItem({ task, onUpdated, onEdit }: Props) {
 
       {/* Main content — clickable for edit */}
       <div
-        onClick={() => onEdit(task)}
+        // onClick={() => onEdit(task)}
         style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}
       >
         <span style={{
@@ -96,16 +106,38 @@ export default function TaskListItem({ task, onUpdated, onEdit }: Props) {
       </div>
 
       {/* Due date */}
-      {task.dueDate && (
-        <span style={{
-          fontSize: '0.75rem',
-          color: '#888',
-          whiteSpace: 'nowrap',
-          flexShrink: 0,
-        }}>
-          {formatDueDate(task.dueDate)}
-        </span>
-      )}
+      {task.dueDate && (() => {
+        const overdueDays = !isDone ? getOverdueDays(task.dueDate) : 0;
+        const isOverdue = overdueDays > 0;
+        return (
+          <span style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+          }}>
+            <span style={{
+              fontSize: '0.75rem',
+              color: isOverdue ? '#c0392b' : '#888',
+            }}>
+              {formatDueDate(task.dueDate)}
+            </span>
+            {isOverdue && (
+              <span style={{
+                fontSize: '0.7rem',
+                fontWeight: 600,
+                color: '#fff',
+                background: '#c0392b',
+                borderRadius: '4px',
+                padding: '1px 5px',
+              }}>
+                {overdueDays}d late
+              </span>
+            )}
+          </span>
+        );
+      })()}
 
       {/* Recurring icon */}
       {task.recurrence?.enabled && (
@@ -117,7 +149,7 @@ export default function TaskListItem({ task, onUpdated, onEdit }: Props) {
         value={task.status}
         onChange={async (e) => {
           await updateTask(task._id, { title: task.title, status: e.target.value } as any);
-          onUpdated();
+          // onUpdated();
         }}
         onClick={(e) => e.stopPropagation()}
         style={{

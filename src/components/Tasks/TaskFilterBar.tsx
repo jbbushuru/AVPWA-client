@@ -17,7 +17,7 @@ export default function TaskFilter({ filters, onChange, hasFilters }: Props) {
         status: nextStatus
       }); 
     }
-    const Priorities = ["All","Low","Medium","High"]
+    const Priorities = ["All","low","medium","high"]
     const handlePrioritySelect = (value:string) => {
       const nextPriority = filters.priority === value ? "All" : value;
       onChange({

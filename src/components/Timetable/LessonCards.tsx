@@ -17,9 +17,9 @@ export const LessonCard: React.FC<LessonCardProps> = ({ lesson, date, currentTim
   const { settings } = useApp();
   const [editModalOpen, setEditModalOpen] = useState(false);
   const { invalidateLessons } = useLessons();
+  // Only invalidate — EditLesson calls onClose() itself after onLessonUpdated()
   const handleLessonUpdated = () => {
     invalidateLessons();
-    setEditModalOpen(false);
   };
   const lessonDuration = settings?.lessonDuration || 60;
 
@@ -59,19 +59,31 @@ export const LessonCard: React.FC<LessonCardProps> = ({ lesson, date, currentTim
 
   return (
     <div className={`relative flex-1 w-full h-full p-4 rounded-md transition-all ${styles.card}`}>
-      {/* Top Badge */}
+      {/* Mobile edit tap target — overlays the whole card, only shown on small screens for non-completed lessons */}
+      {status !== 'completed' && (
+        <button
+          type="button"
+          aria-label="Edit lesson"
+          className="md:hidden absolute inset-0 w-full h-full rounded-md z-10"
+          onClick={() => setEditModalOpen(true)}
+        />
+      )}
+
+      {/* Top Badge (desktop) */}
       <div className="flex justify-end max-md:hidden gap-1">
         <div className={`px-2.5 py-1 rounded-md text-xs flex items-center gap-1.5 font-medium ${styles.badge}`}>
           {styles.badgeIcon}
           <span>{styles.badgeText}</span>
         </div>
-        {status !== 'completed' && 
-         <button 
-         className={`px-2 py-1 rounded-md cursor-pointer ${styles.badge} hover:scale-110 transition-transform`}
-         onClick={() => setEditModalOpen(true)}>
-           <Pencil className="w-3 h-3 stroke-2 " />
-         </button>
-        }
+        {status !== 'completed' && (
+          <button
+            type="button"
+            className={`px-2 py-1 rounded-md cursor-pointer ${styles.badge} hover:scale-110 transition-transform`}
+            onClick={() => setEditModalOpen(true)}
+          >
+            <Pencil className="w-3 h-3 stroke-2" />
+          </button>
+        )}
       </div>
 
       {/* Lesson Details */}
@@ -96,9 +108,7 @@ export const LessonCard: React.FC<LessonCardProps> = ({ lesson, date, currentTim
       <EditLesson
         isOpen={editModalOpen}
         onClose={() => setEditModalOpen(false)}
-        onLessonUpdated={() => {
-          handleLessonUpdated();
-        }}
+        onLessonUpdated={handleLessonUpdated}
         lesson={lesson}
       />
     </div>

@@ -3,11 +3,11 @@ import ActionButton from "../components/Shared/Button";
 import CreateTask from "../components/Tasks/CreateTask";
 import { useEffect, useState } from 'react';
 import { fetchTasks, TaskFilters } from '../services/taskService';
-import { bucketTasks, Task } from '../utils/dateBuckets';
+import { Task } from '../utils/dateBuckets';
 import TaskFilter from '../components/Tasks/TaskFilterBar';
-import TaskListItem from '../components/Tasks/TaskListItem';
 import TasksHeader from "../components/Tasks/TasksHeader";
 import EmptyState from "../components/Tasks/EmptyState";
+import ViewTasks from "../components/Tasks/View_Tasks";
 
 const BUCKET_LABELS: Record<string, string> = {
   overdue: 'Overdue',
@@ -37,8 +37,6 @@ export default function Tasks() {
         .finally(() => setLoading(false));
     }, [filters, refreshKey]);
 
-    const buckets = bucketTasks(tasks);
-
     return (
         <div className="flex flex-col gap-6"> 
             <div className="flex justify-between items-center max-md:hidden"> 
@@ -55,20 +53,10 @@ export default function Tasks() {
             <TaskFilter filters={filters} onChange={setFilters} hasFilters={hasActiveFilters}/>
             {loading && <p>Loading...</p>}
             {!loading &&
-            Object.entries(buckets).map(([bucket, bucketTasks]) =>
-            bucketTasks.length > 0 ? (
-                <section key={bucket}>
-                <h2>{BUCKET_LABELS[bucket]}</h2>
-                {bucketTasks.map((task) => (
-                    <TaskListItem
-                        key={task._id}
-                        task={task}
-                        onUpdated={() => setRefreshKey(k => k + 1)}
-                        onEdit={(_task) => { /* TODO: open edit modal */ }}
-                    />
-                ))}
-                </section>
-            ) : null
+            (<ViewTasks 
+             tasks={tasks}
+             loading={loading}
+            />
             )}
 
             {!loading && tasks.length === 0 && <EmptyState variant={hasActiveFilters ? "found" : "none"}/>}

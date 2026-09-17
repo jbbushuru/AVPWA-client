@@ -42,7 +42,7 @@ const NoTasksFound = () => {
         </div>
         <div className="flex flex-col items-center justify-center gap-2">
             <h1 className="text-2xl font-bold ">No Tasks Found.</h1>
-            <p className="text-center">You haven’t created any tasks yet. Start by creating your first task to see it here</p>
+            <p className="text-center">We couldn’t find any tasks matching your current filters.</p>
         </div>
         </div>
     );
