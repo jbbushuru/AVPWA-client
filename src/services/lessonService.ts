@@ -1,6 +1,7 @@
 import { api } from "./api";
 
 export interface Lesson {
+    _id?: string,
     dateKey: string,
     slot: number,
     unitName: string,
@@ -23,4 +24,13 @@ export const createLesson = async(lessonData:Lesson)=>{
 
 export const deleteAllLessons = async (): Promise<void> => {
     await api.delete('/lessons');
+}
+
+export const updateLesson = async (id: string, lessonData: Partial<Lesson>): Promise<Lesson> => {
+    const { data } = await api.patch(`/lessons/${id}`, lessonData);
+    return data;
+}
+
+export const deleteLesson = async (id: string): Promise<void> => {
+    await api.delete(`/lessons/${id}`);
 }

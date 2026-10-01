@@ -14,10 +14,10 @@ export default function Units() {
     const {profile} = useAuth();
     
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 max-md:pb-20">
             <div className="flex justify-between items-center ">
                 <UnitsHeader />
-                <div className="flex gap-2">
+                <div className="flex gap-2 max-md:hidden">
                 <ActionButton 
                 text="Upload Transcript"
                 icon={Upload}
@@ -49,6 +49,24 @@ export default function Units() {
             <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-4">
                 <StrengthEvolutionTimeline />
                 <SkillCompetencyMapping />
+            </div>
+            {/* Mobile Buttons */}
+            <div className="fixed bottom-20 right-6 flex justify-between items-center md:hidden ">
+                <div className="flex flex-col gap-2">
+                <ActionButton 
+                icon={Upload}
+                bgColor='bg-primary hover:opacity-60'
+                iconColor="text-white"
+                className="rounded-full! w-12 h-12 p-0! gap-0! flex items-center justify-center shadow-lg [&_svg]:w-5 [&_svg]:h-5"
+                />   
+                <ActionButton
+                icon={Plus}
+                bgColor='bg-primary hover:opacity-60'
+                iconColor="text-white"
+                className="rounded-full! w-12 h-12 p-0! gap-0! flex items-center justify-center shadow-lg [&_svg]:w-5 [&_svg]:h-5"
+                onClick={() => setAddUnitModalOpen(true)}
+                /> 
+                </div> 
             </div>
             
         </div>

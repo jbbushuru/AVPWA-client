@@ -9,7 +9,7 @@ export default function ViewToggle({ activeView, onViewChange }: ViewToggleProps
     return (
         <div className="flex items-center justify-between">
             {/* View Mode Switcher */}
-            <div className="flex items-center p-1.5 max-md:p-1 bg-primary/25 border border-(--border-main) rounded-full select-none gap-1">
+            <div className="flex items-center p-1.5 max-md:p-1 bg-secondary/25 border border-(--border-main) rounded-full select-none gap-1">
                 <button
                     type="button"
                     onClick={() => onViewChange("Daily")}
