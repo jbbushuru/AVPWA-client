@@ -8,6 +8,10 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import PageNotFound from './pages/404';
 import ProtectedRoute from './components/ProtectedRoute';
+import ForgotPassword from './pages/ForgotPassword';
+import OtpVerification from './pages/OTP';
+import ChangePassword from './pages/ChangePassword';
+
 
 export default function App() {
   return (
@@ -22,6 +26,11 @@ export default function App() {
         <Route path="/login" element={<Login/>} />
         <Route path="/signup" element={<Signup/>} />
         <Route path="*" element={<PageNotFound/>} />
+        <Route path="/ForgotPassword" element={<ForgotPassword/>} />
+        <Route path="/OtpVerification" element={<OtpVerification/>} />
+        <Route path="/ChangePassword" element={<ChangePassword/>} />
+       
+
       </Routes>
     </Router>
   )

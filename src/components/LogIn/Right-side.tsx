@@ -92,12 +92,12 @@ return(
                         <label className="text-xs font-semibold text-text-muted uppercase tracking-wider block">
                         Password
                         </label>
-                        <a
-                        href="#"
+                        <Link
+                        to="/ForgotPassword"
                         className="text-xs font-semibold text-primary hover:underline transition-all"
                         >
                         Forgot password?
-                        </a>
+                        </Link>
                     </div>
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
