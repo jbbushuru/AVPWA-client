@@ -49,14 +49,7 @@ export const ForgotPassword: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col justify-center items-center p-6 md:p-10 lg:p-16 min-h-screen overflow-y-auto">
-      <div className="md:hidden flex items-center gap-2.5 mb-8">
-        <div className="w-8 h-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-          <img src="/favicon.png" alt="AV Logo" className="w-5 h-5 object-contain" />
-        </div>
-        <h1 className="text-xl font-sister text-primary">Academic Vault</h1>
-      </div>
-
-      <div className="w-full max-w-[480px]">
+        <div className="w-full max-w-[480px]">
         {!isSubmitted ? (
           <>
             {/* Icon + Heading */}
